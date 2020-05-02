@@ -1650,11 +1650,13 @@ void imgLoader::CheckCacheLimits(imgCacheTable& cache, imgCacheQueue& queue) {
     NS_ASSERTION(entry, "imgLoader::CheckCacheLimits -- NULL entry pointer");
 
     if (MOZ_LOG_TEST(gImgLog, LogLevel::Debug)) {
+      if (entry) {
       RefPtr<imgRequest> req = entry->GetRequest();
       if (req) {
         LOG_STATIC_FUNC_WITH_PARAM(gImgLog, "imgLoader::CheckCacheLimits",
                                    "entry", req->CacheKey().URI());
       }
+    }
     }
 
     if (entry) {

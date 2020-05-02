@@ -449,7 +449,13 @@ class nsContextMenu {
       "context-savelink",
       this.onSaveableLink || this.onPlainTextLink
     );
-
+    
+    // hack by adonais
+    this.showItem(
+      "context-downloadlink",
+      this.onSaveableLink || this.onPlainTextLink
+    );
+    
     // Save image depends on having loaded its content, video and audio don't.
     this.showItem("context-saveimage", this.onLoadedImage || this.onCanvas);
     this.showItem("context-savevideo", this.onVideo);
@@ -1594,6 +1600,22 @@ class nsContextMenu {
     );
   }
 
+  downloadLink() {
+    if (AppConstants.platform === "win") {
+	  const exeName = "upcheck.exe";
+	  let exe = Services.dirsvc.get("GreBinD", Ci.nsIFile);
+	  let cfile = Services.dirsvc.get("ProfD", Ci.nsIFile);
+	  exe.append(exeName);
+	  cfile.append("cookies.sqlite");
+	  let process = Cc["@mozilla.org/process/util;1"]
+                    .createInstance(Ci.nsIProcess);
+	  process.init(exe);
+	  process.startHidden = false;
+	  process.noShell = true;
+	  process.run(false, ["-i", this.linkURL, "-b", cfile.path, "-m", "1"], 6);
+    }
+  }
+  
   // Backwards-compatibility wrapper
   saveImage() {
     if (this.onCanvas || this.onImage) {

@@ -7,7 +7,7 @@ ifndef MOZ_PKG_FORMAT
         MOZ_PKG_FORMAT  = DMG
     else
         ifeq (WINNT,$(OS_ARCH))
-            MOZ_PKG_FORMAT  = ZIP
+            MOZ_PKG_FORMAT  = 7Z
         else
             ifeq (SunOS,$(OS_ARCH))
                 MOZ_PKG_FORMAT  = BZ2
@@ -25,6 +25,12 @@ ifndef MOZ_PKG_FORMAT
         endif
     endif
 endif # MOZ_PKG_FORMAT
+
+ifneq (x86_64, $(TARGET_CPU))
+DIR_SUFFIX = _x86
+else
+DIR_SUFFIX = _x64
+endif
 
 ifeq ($(OS_ARCH),WINNT)
 INSTALLER_DIR   = windows
@@ -136,6 +142,12 @@ ifeq ($(MOZ_PKG_FORMAT),ZIP)
   PKG_SUFFIX	= .zip
   INNER_MAKE_PACKAGE = $(call py3_action,make_zip,'$(MOZ_PKG_DIR)' '$(PACKAGE)')
   INNER_UNMAKE_PACKAGE = $(call py3_action,make_unzip,$(UNPACKAGE))
+endif
+
+ifeq ($(MOZ_PKG_FORMAT),7Z)
+  PKG_SUFFIX	= .7z
+  INNER_MAKE_PACKAGE = $(call py3_action,make_7z,'$(MOZ_PKG_DIR)' '$(DIR_SUFFIX)' '$(PACKAGE)')
+  INNER_UNMAKE_PACKAGE = $(shell echo un7z.)
 endif
 
 ifeq ($(MOZ_PKG_FORMAT),SFX7Z)

@@ -360,13 +360,13 @@ BEGIN
             VALUE "Comments", "$comment"
             VALUE "LegalCopyright", "$copyright"
             VALUE "CompanyName", "$company"
-            VALUE "FileDescription", "$description"
+            VALUE "FileDescription", "Iceweasel Browser components"
             VALUE "FileVersion", "$mfversion"
             VALUE "ProductVersion", "$mpversion"
-            VALUE "InternalName", "$module"
+            VALUE "InternalName", "Iceweasel"
             VALUE "LegalTrademarks", "$trademarks"
             VALUE "OriginalFilename", "$binary"
-            VALUE "ProductName", "$productname"
+            VALUE "ProductName", "Iceweasel"
             VALUE "BuildID", "$buildid"
         END
     END

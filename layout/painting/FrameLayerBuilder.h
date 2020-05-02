@@ -309,6 +309,11 @@ struct ContainerLayerParameters {
             aParent.mDisableSubpixelAntialiasingInDescendants),
         mLayerCreationHint(aParent.mLayerCreationHint) {}
 
+  bool Scaled() {
+    return (0x3f800000 != *(uint32_t *)&mXScale) ||
+           (0x3f800000 != *(uint32_t *)&mYScale);
+  }
+  
   float mXScale, mYScale;
 
   LayoutDeviceToLayerScale2D Scale() const {

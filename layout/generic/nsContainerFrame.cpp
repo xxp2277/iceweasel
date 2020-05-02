@@ -6,6 +6,10 @@
 
 /* base class #1 for rendering objects that have child lists */
 
+#if (_M_IX86_FP >= 1) || defined(__SSE__) || defined(_M_AMD64) || defined(__amd64__)
+#include <xmmintrin.h>
+#endif
+
 #include "nsContainerFrame.h"
 
 #include "mozilla/ComputedStyle.h"
@@ -289,7 +293,12 @@ void nsContainerFrame::DestroyFrom(nsIFrame* aDestructRoot,
 /////////////////////////////////////////////////////////////////////////////
 // Child frame enumeration
 
-const nsFrameList& nsContainerFrame::GetChildList(ChildListID aListID) const {
+#ifdef _MSC_VER
+#pragma optimize("g", off)
+#endif
+const nsFrameList&
+nsContainerFrame::GetChildList(ChildListID aListID) const
+{
   // We only know about the principal child list, the overflow lists,
   // and the backdrop list.
   switch (aListID) {
@@ -317,7 +326,12 @@ const nsFrameList& nsContainerFrame::GetChildList(ChildListID aListID) const {
   }
 }
 
-void nsContainerFrame::GetChildLists(nsTArray<ChildList>* aLists) const {
+#ifdef _MSC_VER
+#pragma optimize("", on)
+#endif
+void
+nsContainerFrame::GetChildLists(nsTArray<ChildList>* aLists) const
+{
   mFrames.AppendIfNonempty(aLists, kPrincipalList);
 
   using T = mozilla::FrameProperties::UntypedDescriptor;
@@ -361,6 +375,9 @@ void nsContainerFrame::BuildDisplayListForNonBlockChildren(
   nsDisplayListSet set(aLists, aLists.Content());
   // The children should be in content order
   while (kid) {
+#if (_M_IX86_FP >= 1) || defined(__SSE__) || defined(_M_AMD64) || defined(__amd64__)
+    _mm_prefetch((char *)kid->GetNextSibling(), _MM_HINT_T0);
+#endif
     BuildDisplayListForChild(aBuilder, kid, set, aFlags);
     kid = kid->GetNextSibling();
   }
@@ -1216,6 +1233,9 @@ void nsContainerFrame::DisplayOverflowContainers(
   nsFrameList* overflowconts = GetPropTableFrames(OverflowContainersProperty());
   if (overflowconts) {
     for (nsIFrame* frame : *overflowconts) {
+#if (_M_IX86_FP >= 1) || defined(__SSE__) || defined(_M_AMD64) || defined(__amd64__)
+      _mm_prefetch((char *)frame->GetNextSibling(), _MM_HINT_T0);
+#endif
       BuildDisplayListForChild(aBuilder, frame, aLists);
     }
   }

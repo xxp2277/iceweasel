@@ -1287,6 +1287,11 @@ class ContainerState {
   nsIntRect ScaleToNearestPixels(const nsRect& aRect) const {
     return aRect.ScaleToNearestPixels(mParameters.mXScale, mParameters.mYScale,
                                       mAppUnitsPerDevPixel);
+
+  }
+  nsIntRect ToNearestPixels(const nsRect& aRect) const
+  {
+    return aRect.ToNearestPixels(mAppUnitsPerDevPixel);
   }
   nsIntRect ScaleToOutsidePixels(const nsRect& aRect,
                                  bool aSnap = false) const {
@@ -1299,12 +1304,27 @@ class ContainerState {
     return aRect.ScaleToOutsidePixels(mParameters.mXScale, mParameters.mYScale,
                                       mAppUnitsPerDevPixel);
   }
+  nsIntRect ToOutsidePixels(const nsRect& aRect, bool aSnap = false) const
+  {
+    if (aSnap && mSnappingEnabled) {
+      return ToNearestPixels(aRect);
+    }
+    return aRect.ToOutsidePixels(mAppUnitsPerDevPixel);
+  }  
+
   nsIntRect ScaleToInsidePixels(const nsRect& aRect, bool aSnap = false) const {
     if (aSnap && mSnappingEnabled) {
       return ScaleToNearestPixels(aRect);
     }
     return aRect.ScaleToInsidePixels(mParameters.mXScale, mParameters.mYScale,
                                      mAppUnitsPerDevPixel);
+  }
+  nsIntRect ToInsidePixels(const nsRect& aRect, bool aSnap = false) const
+  {
+    if (aSnap && mSnappingEnabled) {
+      return ToNearestPixels(aRect);
+    }
+    return aRect.ToInsidePixels(mAppUnitsPerDevPixel);
   }
   nsIntRegion ScaleRegionToNearestPixels(const nsRegion& aRegion) const {
     return aRegion.ScaleToNearestPixels(
@@ -4471,6 +4491,8 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
   PerfStats::AutoMetricRecording<PerfStats::Metric::LayerBuilding>
       autoRecording;
 
+
+  const bool scaled = mParameters.Scaled();
   nsPoint topLeft(0, 0);
 
   int32_t maxLayers = StaticPrefs::layers_max_active();
@@ -4634,12 +4656,13 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
         itemType == DisplayItemType::TYPE_TRANSFORM &&
         static_cast<nsDisplayTransform*>(item)->MayBeAnimated(mBuilder);
 
-    nsIntRect itemDrawRect = ScaleToOutsidePixels(itemContent, snap);
+
+    nsIntRect itemDrawRect = scaled ? ScaleToOutsidePixels(itemContent, snap) : ToOutsidePixels(itemContent, snap);
     ParentLayerIntRect clipRect;
     if (itemClip.HasClip()) {
       const nsRect& itemClipRect = itemClip.GetClipRect();
       itemContent.IntersectRect(itemContent, itemClipRect);
-      clipRect = ViewAs<ParentLayerPixel>(ScaleToNearestPixels(itemClipRect));
+      clipRect = ViewAs<ParentLayerPixel>(scaled ? ScaleToNearestPixels(itemClipRect) : ToNearestPixels(itemClipRect));
 
       if (!prerenderedTransform && !IsScrollThumbLayer(item)) {
         itemDrawRect.IntersectRect(itemDrawRect, clipRect.ToUnknownRect());
@@ -4695,7 +4718,7 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
       }
 
       itemVisibleRect = itemVisibleRect.Intersect(
-          ScaleToOutsidePixels(itemBuildingRect, false));
+        scaled ? ScaleToOutsidePixels(itemBuildingRect, false) : ToOutsidePixels(itemBuildingRect, false));
     }
 
     const bool forceInactive = maxLayers != -1 && layerCount >= maxLayers;
@@ -4768,8 +4791,8 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
         AnimatedGeometryRoot* clipAGR =
             mBuilder->AnimatedGeometryRootForASR(clipASR);
         nsIntRect scrolledClipRect =
-            ScaleToNearestPixels(layerClipChain->mClip.GetClipRect()) +
-            mParameters.mOffset;
+          (scaled ? ScaleToNearestPixels(layerClipChain->mClip.GetClipRect()) : ToNearestPixels(layerClipChain->mClip.GetClipRect())) + mParameters.mOffset;
+
         mPaintedLayerDataTree.AddingOwnLayer(clipAGR, &scrolledClipRect,
                                              uniformColorPtr);
       } else if (item->ShouldFixToViewport(mBuilder) && itemClip.HasClip() &&
@@ -4783,7 +4806,7 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
         AnimatedGeometryRoot* clipAGR =
             item->AnimatedGeometryRootForScrollMetadata();
         nsIntRect scrolledClipRect =
-            ScaleToNearestPixels(itemClip.GetClipRect()) + mParameters.mOffset;
+          (scaled ? ScaleToNearestPixels(itemClip.GetClipRect()) : ToNearestPixels(itemClip.GetClipRect())) + mParameters.mOffset;
         mPaintedLayerDataTree.AddingOwnLayer(clipAGR, &scrolledClipRect,
                                              uniformColorPtr);
       } else if (IsScrollThumbLayer(item) && mManager->IsWidgetLayerManager()) {
@@ -4951,8 +4974,8 @@ void ContainerState::ProcessDisplayItems(nsDisplayList* aList) {
         const DisplayItemClip& scrolledClip = layerClipChain->mClip;
         LayerClip scrolledLayerClip;
         scrolledLayerClip.SetClipRect(ViewAs<ParentLayerPixel>(
-            ScaleToNearestPixels(scrolledClip.GetClipRect()) +
-            mParameters.mOffset));
+          (scaled ? ScaleToNearestPixels(scrolledClip.GetClipRect()) : ToNearestPixels(scrolledClip.GetClipRect())) + mParameters.mOffset));
+
         if (scrolledClip.GetRoundedRectCount() > 0) {
           scrolledLayerClip.SetMaskLayerIndex(
               SetupMaskLayerForScrolledClip(ownLayer.get(), scrolledClip));

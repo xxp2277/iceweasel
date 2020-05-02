@@ -648,6 +648,10 @@ static BITMAPINFO* CreateBitmapInfo(BITMAPINFOHEADER* aHeader,
   return bmi;
 }
 
+#ifdef _MSC_VER
+#pragma function(memcpy)
+#endif
+
 nsresult nsIconChannel::EnsurePipeCreated(uint32_t aIconSize,
                                           bool aNonBlocking) {
   if (mInputStream || mOutputStream) {
@@ -797,6 +801,9 @@ nsresult nsIconChannel::MakeInputStream(nsIInputStream** _retval,
   mOutputStream = nullptr;
   return rv;
 }
+#ifdef _MSC_VER
+#pragma intrinsic(memcpy)
+#endif
 
 NS_IMETHODIMP
 nsIconChannel::GetContentType(nsACString& aContentType) {

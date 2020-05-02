@@ -8,9 +8,10 @@ include('/ipc/chromium/chromium-config.mozbuild')
 
 FINAL_LIBRARY = 'xul'
 
-DIRS = [
-    'pingsender',
-]
+if CONFIG['MOZ_CRASHREPORTER']:
+    DIRS = [
+        'pingsender',
+    ]
 
 DEFINES['MOZ_APP_VERSION'] = '"%s"' % CONFIG['MOZ_APP_VERSION']
 

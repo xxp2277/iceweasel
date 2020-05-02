@@ -379,9 +379,7 @@ _pixman_disabled (const char *name)
 pixman_implementation_t *
 _pixman_choose_implementation (void)
 {
-    pixman_implementation_t *imp;
-
-    imp = _pixman_implementation_create_general();
+    pixman_implementation_t *imp = _pixman_implementation_create_general();
 
     if (!_pixman_disabled ("fast"))
 	imp = _pixman_implementation_create_fast_path (imp);

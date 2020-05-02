@@ -2534,13 +2534,13 @@ static bool CheckCompatibility(nsIFile* aProfileDir, const nsCString& aVersion,
   if (NS_FAILED(rv)) {
     return false;
   }
-
+#ifndef TT_MEMUTIL
   int32_t result = CompareCompatVersions(aLastVersion, aVersion);
   if (result != 0) {
     *aIsDowngrade = result > 0;
     return false;
   }
-
+#endif
   nsAutoCString buf;
   rv = parser.GetString("Compatibility", "LastOSABI", buf);
   if (NS_FAILED(rv) || !aOSABI.Equals(buf)) return false;
@@ -3722,7 +3722,7 @@ int XREMain::XRE_mainStartup(bool* aExitFlag) {
 
   // Set program name to the one defined in application.ini.
   {
-    nsAutoCString program(gAppData->name);
+    nsAutoCString program(gAppData->remotingName);
     ToLowerCase(program);
     g_set_prgname(program.get());
   }

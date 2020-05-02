@@ -853,14 +853,24 @@ HWND WinUtils::GetTopLevelHWND(HWND aWnd, bool aStopIfNotChild,
   return topWnd;
 }
 
-static const wchar_t* GetNSWindowPropName() {
-  static wchar_t sPropName[40] = L"";
-  if (!*sPropName) {
+class CAtom_NSWindowPropName {
+public:
+  CAtom_NSWindowPropName() {
+    wchar_t sPropName[40] = L"";
     _snwprintf(sPropName, 39, L"MozillansIWidgetPtr%u",
                ::GetCurrentProcessId());
     sPropName[39] = '\0';
+    atom = ::GlobalAddAtomW(sPropName);
   }
-  return sPropName;
+  ~CAtom_NSWindowPropName() {
+    ::GlobalDeleteAtom(atom);
+  }
+  ATOM atom;
+};
+
+static const wchar_t* GetNSWindowPropName() {
+  static CAtom_NSWindowPropName gaNswpn;
+  return (const wchar_t*)(UINT_PTR)gaNswpn.atom;
 }
 
 /* static */

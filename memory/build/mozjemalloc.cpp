@@ -146,6 +146,7 @@
 #include "rb.h"
 #include "Mutex.h"
 #include "Utils.h"
+#include "mozilla/SSE.h"
 
 using namespace mozilla;
 
@@ -2820,6 +2821,11 @@ void* arena_t::MallocSmall(size_t aSize, bool aZero) {
   MOZ_DIAGNOSTIC_ASSERT(aSize == bin->mSizeClass);
 
   {
+#ifdef MOZILLA_MAY_SUPPORT_SSE
+    if (mozilla::supports_sse()) {
+      _mm_prefetch((char *)bin, _MM_HINT_NTA);
+    }
+#endif
     // Before we lock, we determine if we need to randomize the allocation
     // because if we do, we need to create the PRNG which might require
     // allocating memory (arc4random on OSX for example) and we need to
@@ -2858,6 +2864,13 @@ void* arena_t::MallocSmall(size_t aSize, bool aZero) {
       return nullptr;
     }
 
+#ifdef MOZILLA_MAY_SUPPORT_SSE
+    if (mozilla::supports_sse()) {
+      _mm_prefetch((char *)ret, _MM_HINT_NTA);
+      _mm_prefetch((char *)ret + 64, _MM_HINT_NTA);
+    }
+#endif
+
     mStats.allocated_small += aSize;
   }
 
@@ -2882,6 +2895,12 @@ void* arena_t::MallocLarge(size_t aSize, bool aZero) {
     if (!ret) {
       return nullptr;
     }
+#ifdef MOZILLA_MAY_SUPPORT_SSE
+    if (mozilla::supports_sse()) {
+      _mm_prefetch((char *)ret, _MM_HINT_NTA);
+      _mm_prefetch((char *)ret + 64, _MM_HINT_NTA);
+    }
+#endif
     mStats.allocated_large += aSize;
   }
 
