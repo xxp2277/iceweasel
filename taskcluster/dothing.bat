@@ -1,21 +1,12 @@
 @echo off&setlocal enabledelayedexpansion
 
-set M_BITS=0
-IF NOT DEFINED SOURCE_DIR SET SOURCE_DIR="%1"
-IF not exist "!SOURCE_DIR!" mkdir "!SOURCE_DIR!"&echo SOURCE_DIR: !SOURCE_DIR!
-IF NOT DEFINED BUID_DIR SET BUID_DIR=d:\works
-IF not exist "!BUID_DIR!" mkdir "!BUID_DIR!"&echo BUID_DIR: !BUID_DIR!
-@echo 
-@echo GITHUB_WORKSPACE: %GITHUB_WORKSPACE%
-@cd /d %GITHUB_WORKSPACE%
-if exist mozconfig32 set M_BITS=32&call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32"
-if exist mozconfig64 set M_BITS=64&call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64"
-@echo
-@echo .........................
-@set PATH=%PATH%;!BUID_DIR!\mozillabuild\bin;!BUID_DIR!\mozillabuild\clang\bin
-@echo PATH: [%PATH%]
-@cd /d "!BUID_DIR!"
-if "!M_BITS!" == "0" @echo mozconfig32 or mozconfig64 not exist&EXIT /B 4
+if not defined SOURCE_DIR set SOURCE_DIR="%1"
+if not exist "!SOURCE_DIR!" mkdir "!SOURCE_DIR!"&echo SOURCE_DIR: !SOURCE_DIR!
+if not defined BUID_DIR set BUID_DIR=d:\works
+if not exist "!BUID_DIR!" mkdir "!BUID_DIR!"&echo BUID_DIR: !BUID_DIR!
+
+if not defined MY_BITS @echo mozconfig32 or mozconfig64 not exist.&EXIT /B 4
+if not defined LIBPORTABLE_PATH @echo Build libportable need this path.&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\clang" @echo clang not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\msys" @echo msys not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\nodejs" @echo nodejs not exist&EXIT /B 4
@@ -24,6 +15,21 @@ if not exist "!BUID_DIR!\mozillabuild\rust" @echo rust not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\python" @echo python not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\python3" @echo python3 not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\msysdo.exe" @echo msysdo not exist&EXIT /B 4
+
+@if "%MY_BITS%" == "win32" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32"
+@if "%MY_BITS%" == "win64" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64"
+
+@echo ##########################
+@set PATH=!BUID_DIR!\mozillabuild\bin;!BUID_DIR!\mozillabuild\clang\bin;%PATH%
+@echo PATH: [%PATH%]
+@echo ##########################
+
+@echo ##########################
+@echo List toolchain
+cd /d "%BUID_DIR%\mozillabuild"
+dir /a
+@echo ##########################
+
 @cd /d "!SOURCE_DIR!"
 @git clone --depth=1 https://github.com/adonais/libportable.git libportable-src
 @echo libportable-src:
@@ -34,10 +40,12 @@ if not exist "!BUID_DIR!\mozillabuild\msysdo.exe" @echo msysdo not exist&EXIT /B
 nmake -f Makefile.msvc CC=clang-cl clean
 nmake -f Makefile.msvc CC=clang-cl install
 
+@echo ##########################
 @cd /d %GITHUB_WORKSPACE%
 @rd /s/q "!SOURCE_DIR!\libportable-src"
-@echo
+@echo GITHUB_WORKSPACE: [%GITHUB_WORKSPACE%]
 @dir %GITHUB_WORKSPACE% /a
+@echo ##########################
 
 ::@echo .........................
 ::@echo msvc version:

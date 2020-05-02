@@ -17,9 +17,21 @@ jobs:
       with:
         fetch-depth: 1
     
-    - name: Create directory
-      id: mkdir
-      run: mkdir "%BUID_DIR%\mozillabuild"
+    - name: Set variable
+      id: set_var
+      run: |
+        cd /d %GITHUB_WORKSPACE%
+        if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release
+        if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release
+        if not exist "%BUID_DIR%\mozillabuild" mkdir "%BUID_DIR%\mozillabuild"
+        type config\milestone.txt|findstr "[1-9]">tmp_1.txt
+        set /p m_ver=<tmp_1.txt
+        del /q tmp_1.txt >nul
+        echo ##[set-env name=MY_VER;]%m_ver%
+        echo ##[add-path]%BUID_DIR%\mozillabuild
+        echo ##[set-env name=MY_BITS;]%m_bits%
+        echo ##[set-env name=MY_OBJ;]%m_obj%
+        echo ##[set-env name=LIBPORTABLE_PATH;]%BUID_DIR%\mozillabuild\clang
       shell: cmd    
       
     - name: Download basic tools
@@ -113,29 +125,9 @@ jobs:
     - name: Show envs
       id: show_env
       run: |
-        echo ##[add-path]%BUID_DIR%\mozillabuild
-        cd /d %GITHUB_WORKSPACE%
-        type config\milestone.txt|findstr "[1-9]">tmp_1.txt
-        set /p m_ver=<tmp_1.txt
-        del /q tmp_1.txt >nul
-        if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release
-        if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release
-        echo ##[set-env name=MY_VER;]%m_ver%
-        echo ##[set-env name=MY_BITS;]%m_bits%
-        echo ##[set-env name=MY_OBJ;]%m_obj%
-        echo ##[set-env name=MY_TIME;]%GITHUB_SHA:~0,8%
-        echo ##[set-env name=LIBPORTABLE_PATH;]%BUID_DIR%\mozillabuild\clang
         .\taskcluster\dothing.bat "%SOURCE_DIR%"
       shell: cmd
-      
-    - name: List toolchain
-      id: toolchain
-      run: |
-        cd /d "%BUID_DIR%\mozillabuild"
-        dir /a
-        echo "toolchain ok!"
-      shell: cmd
-            
+     
     - name: Start msys-shell
       id: msys_shell
       run: |
@@ -150,6 +142,13 @@ jobs:
       with:
         path: ${{ github.workspace }}/../${{ env.MY_OBJ }}/dist/${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
         name: ${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
+
+    - name: Current time
+      uses: nanzm/get-time-action@v1.0
+      id: current-time
+      with:
+        timeZone: 8
+        format: YYYYMMDDHHmmss
  
     - name: Create Release
       id: create_release
@@ -157,8 +156,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ADONAIS_RELEASE_TOKEN }}
       with:
-        tag_name: ${{ env.MY_TIME }}
-        release_name: Release ${{ env.MY_TIME }}
+        tag_name: ${{ steps.current-time.outputs.time }}
+        release_name: Release ${{ steps.current-time.outputs.time }}
         draft: false
         prerelease: false
         
