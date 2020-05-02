@@ -1,0 +1,184 @@
+name: Windows environment
+on: 
+  push:
+    branches: 
+      - iceweasel_release
+env:
+  BUID_DIR: d:\works
+  SOURCE_DIR: d:\works\3rdparty
+  APP_NAME: Iceweasel
+
+jobs:
+  fx_build:
+    name: Iceweasel build
+    runs-on: windows-latest
+    steps:        
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    
+    - name: Create directory
+      id: mkdir
+      run: mkdir "%BUID_DIR%\mozillabuild"
+      shell: cmd    
+      
+    - name: Download basic tools
+      id: bin
+      shell: cmake -P {0}
+      run: |
+        set(bin_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/bin.tar.gz")
+        file(DOWNLOAD "${bin_url}" $ENV{BUID_DIR}/bin.tar.gz SHOW_PROGRESS) 
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar zxvf ./bin.tar.gz WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download clang
+      id: clang
+      shell: cmake -P {0}
+      run: |
+        set(clang_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/clang-msvc-10.0.0.7z")
+        file(DOWNLOAD "${clang_url}" $ENV{BUID_DIR}/clang-msvc-10.0.0.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./clang-msvc-10.0.0.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download msys
+      id: msys
+      shell: cmake -P {0}
+      run: |
+        set(msys_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/msys-1.0.7z")
+        file(DOWNLOAD "${msys_url}" $ENV{BUID_DIR}/msys-1.0.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./msys-1.0.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download nodejs
+      id: nodejs
+      shell: cmake -P {0}
+      run: |
+        set(nodejs_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/nodejs.7z")
+        file(DOWNLOAD "${nodejs_url}" $ENV{BUID_DIR}/nodejs.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./nodejs.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download nsis
+      id: nsis301
+      shell: cmake -P {0}
+      run: |
+        set(nsis301_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/nsis301.7z")
+        file(DOWNLOAD "${nsis301_url}" $ENV{BUID_DIR}/nsis301.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./nsis301.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download kdiff3
+      id: kdiff3
+      shell: cmake -P {0}
+      run: |
+        set(kdiff3_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/kdiff3.7z")
+        file(DOWNLOAD "${kdiff3_url}" $ENV{BUID_DIR}/kdiff3.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./kdiff3.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download hg
+      id: mercurial
+      shell: cmake -P {0}
+      run: |
+        set(hg_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/hg.7z")
+        file(DOWNLOAD "${hg_url}" $ENV{BUID_DIR}/hg.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./hg.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download rust
+      id: rust
+      shell: cmake -P {0}
+      run: |
+        set(rust_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/rust-git.7z")
+        file(DOWNLOAD "${rust_url}" $ENV{BUID_DIR}/rust-git.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./rust-git.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        
+    - name: Download python-2.7.18
+      id: python2
+      shell: cmake -P {0}
+      run: |
+        set(python2_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/python-2.7.18.7z")
+        file(DOWNLOAD "${python2_url}" $ENV{BUID_DIR}/python-2.7.18.7z SHOW_PROGRESS)  
+        execute_process(COMMAND 7z x ./python-2.7.18.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})  
+        
+    - name: Download python-3.7.7
+      id: python3
+      shell: cmake -P {0}
+      run: |
+        set(python3_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/python-3.7.7.7z")
+        file(DOWNLOAD "${python3_url}" $ENV{BUID_DIR}/python-3.7.7.7z SHOW_PROGRESS)   
+        execute_process(COMMAND 7z x ./python-3.7.7.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})                                    
+        
+    - name: Download msysdo
+      id: msysdo
+      shell: cmake -P {0}
+      run: |
+        set(msysdo_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/msysdo.7z")
+        file(DOWNLOAD "${msysdo_url}" $ENV{BUID_DIR}/msysdo.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./msysdo.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+                
+    - name: Show envs
+      id: show_env
+      run: |
+        echo ##[add-path]%BUID_DIR%\mozillabuild
+        cd /d %GITHUB_WORKSPACE%
+        type config\milestone.txt|findstr "[1-9]">tmp_1.txt
+        set /p m_ver=<tmp_1.txt
+        del /q tmp_1.txt >nul
+        if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release
+        if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release
+        echo ##[set-env name=MY_VER;]%m_ver%
+        echo ##[set-env name=MY_BITS;]%m_bits%
+        echo ##[set-env name=MY_OBJ;]%m_obj%
+        echo ##[set-env name=MY_TIME;]%GITHUB_SHA:~0,8%
+        echo ##[set-env name=LIBPORTABLE_PATH;]%BUID_DIR%\mozillabuild\clang
+        .\taskcluster\dothing.bat "%SOURCE_DIR%"
+      shell: cmd
+      
+    - name: List toolchain
+      id: toolchain
+      run: |
+        cd /d "%BUID_DIR%\mozillabuild"
+        dir /a
+        echo "toolchain ok!"
+      shell: cmd
+            
+    - name: Start msys-shell
+      id: msys_shell
+      run: |
+        cd /d %GITHUB_WORKSPACE%
+        if "%MY_BITS%" == "win32" echo we build Iceweasel %MY_BITS%&msysdo mv mozconfig32 .mozconfig
+        if "%MY_BITS%" == "win64" echo we build Iceweasel %MY_BITS%&msysdo mv mozconfig64 .mozconfig
+        if exist .mozconfig msysdo fx_build.sh
+      shell: cmd
+      
+    - name: Upload
+      uses: actions/upload-artifact@v1
+      with:
+        path: ${{ github.workspace }}/../${{ env.MY_OBJ }}/dist/${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
+        name: ${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
+ 
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN_YXL0756 }}
+      with:
+        tag_name: ${{ env.MY_TIME }}
+        release_name: Release ${{ env.MY_TIME }}
+        draft: false
+        prerelease: false
+        
+    - name: Store Release url
+      run: |
+        echo "${{ steps.create_release.outputs.upload_url }}" > ./upload_url
+        
+    - uses: actions/upload-artifact@v1
+      with:
+        path: ./upload_url
+        name: upload_url
+                
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN_YXL0756 }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/../${{ env.MY_OBJ }}/dist/${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
+        asset_name: ${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
+        asset_content_type: application/x-gtar
+        
