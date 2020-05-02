@@ -15,15 +15,15 @@ if exist mozconfig64 set M_BITS=64&call "C:\Program Files (x86)\Microsoft Visual
 @set PATH=%PATH%;!BUID_DIR!\mozillabuild\bin;!BUID_DIR!\mozillabuild\clang\bin
 @echo PATH: [%PATH%]
 @cd /d "!BUID_DIR!"
-if "!M_BITS!" == "0" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\clang" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\msys" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\nodejs" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\hg" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\rust" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\python" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\python3" EXIT /B 4
-if not exist "!BUID_DIR!\mozillabuild\msysdo.exe" EXIT /B 4
+if "!M_BITS!" == "0" @echo mozconfig32 or mozconfig64 not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\clang" @echo clang not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\msys" @echo msys not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\nodejs" @echo nodejs not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\hg" @echo hg not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\rust" @echo rust not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\python" @echo python not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\python3" @echo python3 not exist&EXIT /B 4
+if not exist "!BUID_DIR!\mozillabuild\msysdo.exe" @echo msysdo not exist&EXIT /B 4
 @cd /d "!SOURCE_DIR!"
 @git clone --depth=1 https://github.com/adonais/libportable.git libportable-src
 @echo libportable-src:

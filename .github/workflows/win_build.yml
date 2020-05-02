@@ -155,7 +155,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN_YXL0756 }}
+        GITHUB_TOKEN: ${{ secrets.ADONAIS_RELEASE_TOKEN }}
       with:
         tag_name: ${{ env.MY_TIME }}
         release_name: Release ${{ env.MY_TIME }}
@@ -175,7 +175,7 @@ jobs:
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN_YXL0756 }}
+        GITHUB_TOKEN: ${{ secrets.ADONAIS_RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/../${{ env.MY_OBJ }}/dist/${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
