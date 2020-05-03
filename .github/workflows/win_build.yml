@@ -152,7 +152,7 @@ jobs:
  
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: fleskesvor/create-release@1a72e235c178bf2ae6c51a8ae36febc24568c5fe
       env:
         GITHUB_TOKEN: ${{ secrets.ADONAIS_RELEASE_TOKEN }}
       with:
