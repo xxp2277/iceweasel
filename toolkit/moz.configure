@@ -2055,7 +2055,7 @@ with only_when(compile_environment & target_is_linux):
 
 @depends(target)
 def default_browser_agent_default(target):
-    return target.os == 'WINNT'
+    return False
 
 option('--enable-default-browser-agent', default=default_browser_agent_default,
        help='{Enable|Disable} building the default browser agent')

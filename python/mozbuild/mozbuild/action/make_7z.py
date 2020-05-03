@@ -20,6 +20,7 @@ def make_7z(source, suffix, package):
         else:
             path = shutil.copy(user + '/bin/portable32.dll', dist_source)
         path = shutil.copy(user + '/bin/portable(example).ini', dist_source)
+        path = shutil.copy(user + '/bin/upcheck.exe', dist_source)
     subprocess.check_call(['7z', 'a', '-t7z', package, dist_source, '-mx9', '-r', '-y', '-x!.mkdir.done'])
     os.rename(dist_source, source)
     if user:

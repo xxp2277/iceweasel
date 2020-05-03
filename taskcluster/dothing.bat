@@ -39,6 +39,15 @@ dir /a
 @cd /d "!SOURCE_DIR!\libportable-src"
 nmake -f Makefile.msvc CC=clang-cl clean
 nmake -f Makefile.msvc CC=clang-cl install
+@if not "%errorlevel%" == "0" @echo compile libportable failed.&EXIT /B %errorlevel%
+
+@cd /d "!SOURCE_DIR!"
+@git clone --depth=1 https://github.com/adonais/upcheck.git upcheck-src
+@cd /d "!SOURCE_DIR!\upcheck-src"
+nmake clean
+nmake
+@if not "%errorlevel%" == "0" @echo compile upcheck failed.EXIT /B %errorlevel%
+@if exist "%LIBPORTABLE_PATH% copy /y "Release\upcheck.exe" "!LIBPORTABLE_PATH!\bin"
 
 @echo ##########################
 @cd /d %GITHUB_WORKSPACE%
