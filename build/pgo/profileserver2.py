@@ -8,6 +8,7 @@ import json
 import os
 import sys
 import glob
+import shutil
 import subprocess
 
 import mozcrash
@@ -58,24 +59,31 @@ if __name__ == '__main__':
                        port=PORT,
                        options='primary,privileged')
 
-    cmdargs = "http://localhost:%d/index2.html" % PORT
+    cmdargs = "http://localhost:%d/index.html" % PORT
 
+    if os.path.exists("test_png"):
+        shutil.rmtree("test_png")
+    os.mkdir("test_png")
 try:
+    i = 1;
     fireFoxOptions = webdriver.FirefoxOptions()
     fireFoxOptions.set_headless()
-    binary = FirefoxBinary(binary) 
+    binary = FirefoxBinary(binary)
     driver = webdriver.Firefox(firefox_binary=binary, firefox_options=fireFoxOptions)
     m_file = os.path.abspath(os.path.dirname(__file__))
     m_list = open(m_file + "\\url.txt") 
     for line in m_list.readlines(): 
+        m_png = "test_png\\test_%d.png" % i
         line=line.strip('\n')  
-        cmdargs = "http://localhost:%d/%s" % (PORT, line)
+        if line.startswith('http'):
+            cmdargs = line
+        else:
+            cmdargs = "http://localhost:%d/%s" % (PORT, line)
         print(cmdargs);
         driver.get(cmdargs)
         driver.get_screenshot_as_file(m_png)
+        i += 1;
     m_list.close()
-    #driver.get_screenshot_as_file("C:\\Users\\adonais\\Desktop\\test.png")
-    #print(driver.page_source)
 finally:
     try:
         driver.quit()
