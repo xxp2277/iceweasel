@@ -17,7 +17,7 @@ else
   else
     [[ -n $MY_OBJ ]] && MYOBJ_DIR=$MY_OBJ || MYOBJ_DIR=obju64-release
   fi
-  PYTHON_SCRIPT=_virtualenvs/init_py3/Scripts
+  PYTHON_SCRIPT=_virtualenvs/init/Scripts
   MAKE=mozmake
 fi
 
