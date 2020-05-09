@@ -12,19 +12,27 @@ import subprocess
 
 def make_7z(source, suffix, package):
     dist_source = source + suffix
-    os.rename(source, dist_source)
+    if os.path.exists(dist_source):
+        shutil.rmtree(dist_source)
+    if os.path.exists(package):
+        os.remove(package)
+    os.mkdir(dist_source)
+    path = shutil.copytree(source, dist_source + '/App')
     user = os.environ.get('LIBPORTABLE_PATH')
     if user:
         if (suffix == '_x64'):
-            path = shutil.copy(user + '/bin/portable64.dll', dist_source)
+            if os.path.exists('C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Redist/MSVC/14.25.28508/x64/Microsoft.VC142.CRT/vcruntime140_1.dll'):
+                path = shutil.copy('C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Redist/MSVC/14.25.28508/x64/Microsoft.VC142.CRT/vcruntime140_1.dll', dist_source + '/App')
+            if os.path.exists(user + '/bin/portable64.dll'):
+                path = shutil.copy(user + '/bin/portable64.dll', dist_source + '/App')
         else:
-            path = shutil.copy(user + '/bin/portable32.dll', dist_source)
-        path = shutil.copy(user + '/bin/portable(example).ini', dist_source)
-        path = shutil.copy(user + '/bin/upcheck.exe', dist_source)
+            if os.path.exists(user + '/bin/portable32.dll'):
+                path = shutil.copy(user + '/bin/portable32.dll', dist_source + '/App')
+        if os.path.exists(user + '/bin/portable(example).ini'):
+            path = shutil.copy(user + '/bin/portable(example).ini', dist_source + '/App')
+        if os.path.exists(user + '/bin/upcheck.exe'):
+            path = shutil.copy(user + '/bin/upcheck.exe', dist_source + '/App')
     subprocess.check_call(['7z', 'a', '-t7z', package, dist_source, '-mx9', '-r', '-y', '-x!.mkdir.done'])
-    os.rename(dist_source, source)
-    if user:
-        os.remove(source + '/portable(example).ini')
 
 def main(args):
     if len(args) != 3:
