@@ -65,7 +65,7 @@ if __name__ == '__main__':
         shutil.rmtree("test_png")
     os.mkdir("test_png")
 try:
-    i = 1;
+    i = 1
     fireFoxOptions = webdriver.FirefoxOptions()
     fireFoxOptions.set_headless()
     binary = FirefoxBinary(binary)
@@ -79,10 +79,10 @@ try:
             cmdargs = line
         else:
             cmdargs = "http://localhost:%d/%s" % (PORT, line)
-        print(cmdargs);
+        print(cmdargs)
         driver.get(cmdargs)
         driver.get_screenshot_as_file(m_png)
-        i += 1;
+        i += 1
     m_list.close()
 finally:
     try:

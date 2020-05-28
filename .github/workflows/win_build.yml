@@ -24,9 +24,7 @@ jobs:
         if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release
         if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release
         if not exist "%BUID_DIR%\mozillabuild" mkdir "%BUID_DIR%\mozillabuild"
-        type config\milestone.txt|findstr "[1-9]">tmp_1.txt
-        set /p m_ver=<tmp_1.txt
-        del /q tmp_1.txt >nul
+        set /p m_ver=<browser\config\version_display.txt
         echo ##[set-env name=MY_VER;]%m_ver%
         echo ##[add-path]%BUID_DIR%\mozillabuild
         echo ##[set-env name=MY_BITS;]%m_bits%
@@ -46,9 +44,9 @@ jobs:
       id: clang
       shell: cmake -P {0}
       run: |
-        set(clang_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/clang-msvc-10.0.0.7z")
-        file(DOWNLOAD "${clang_url}" $ENV{BUID_DIR}/clang-msvc-10.0.0.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./clang-msvc-10.0.0.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        set(clang_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/clang-msvc-9.0.1.7z")
+        file(DOWNLOAD "${clang_url}" $ENV{BUID_DIR}/clang-msvc-9.0.1.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./clang-msvc-9.0.1.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
         
     - name: Download msys
       id: msys
@@ -94,9 +92,9 @@ jobs:
       id: rust
       shell: cmake -P {0}
       run: |
-        set(rust_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/rust-git.7z")
-        file(DOWNLOAD "${rust_url}" $ENV{BUID_DIR}/rust-git.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./rust-git.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
+        set(rust_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/rust-1.43.1.7z")
+        file(DOWNLOAD "${rust_url}" $ENV{BUID_DIR}/rust-1.43.1.7z SHOW_PROGRESS)
+        execute_process(COMMAND 7z x ./rust-1.43.1.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
         
     - name: Download python-2.7.18
       id: python2
