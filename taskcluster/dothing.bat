@@ -19,6 +19,7 @@ if not defined LIBPORTABLE_PATH @echo Build libportable need this path.&EXIT /B 
 @if exist kdiff3.7z 7z x kdiff3.7z -aoa -o!BUID_DIR!
 @if exist hg.7z 7z x hg.7z -aoa -o!BUID_DIR!
 @if exist rust-1.43.1.7z 7z x rust-1.43.1.7z -aoa -o!BUID_DIR!
+@if exist rust-tools.7z 7z x rust-tools.7z -aoa -o!BUID_DIR!
 @if exist python-2.7.18.7z 7z x python-2.7.18.7z -aoa -o!BUID_DIR!
 @if exist python-3.7.7.7z 7z x python-3.7.7.7z -aoa -o!BUID_DIR!
 @if exist msysdo.7z 7z x msysdo.7z -aoa -o!BUID_DIR!
