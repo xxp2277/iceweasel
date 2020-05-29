@@ -16,11 +16,6 @@ if not exist "!BUID_DIR!\mozillabuild\python" @echo python not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\python3" @echo python3 not exist&EXIT /B 4
 if not exist "!BUID_DIR!\mozillabuild\msysdo.exe" @echo msysdo not exist&EXIT /B 4
 
-for /f "delims=" %%m in ('dir /b "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC"') do (
-set ms_vc=%%m
-)
-if not "%ms_vc%" == "14.25.28508" echo %ms_vc% version mismatch&EXIT /B 4
-
 @if "%MY_BITS%" == "win32" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32"
 @if "%MY_BITS%" == "win64" call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64"
 

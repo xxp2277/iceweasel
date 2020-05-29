@@ -21,8 +21,8 @@ jobs:
       id: set_var
       run: |
         cd /d %GITHUB_WORKSPACE%
-        if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release
-        if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release
+        if exist mozconfig32 set m_bits=win32&set m_obj=obju32-release&call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32"
+        if exist mozconfig64 set m_bits=win64&set m_obj=obju64-release&call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64"
         if not exist "%BUID_DIR%\mozillabuild" mkdir "%BUID_DIR%\mozillabuild"
         set /p m_ver=<browser\config\version_display.txt
         echo ##[set-env name=MY_VER;]%m_ver%
@@ -30,7 +30,9 @@ jobs:
         echo ##[set-env name=MY_BITS;]%m_bits%
         echo ##[set-env name=MY_OBJ;]%m_obj%
         echo ##[set-env name=LIBPORTABLE_PATH;]%BUID_DIR%\mozillabuild\clang
-      shell: cmd    
+        echo ##[set-env name=VC_REDISTDIR;]%VCToolsRedistDir%
+        echo ##[set-env name=UCRT_REDISTDIR;]%UniversalCRTSdkDir%
+      shell: cmd
       
     - name: Download basic tools
       id: bin
