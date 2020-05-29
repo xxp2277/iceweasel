@@ -33,94 +33,6 @@ jobs:
         echo ##[set-env name=VC_REDISTDIR;]%VCToolsRedistDir%
         echo ##[set-env name=UCRT_REDISTDIR;]%UniversalCRTSdkDir%
       shell: cmd
-      
-    - name: Download basic tools
-      id: bin
-      shell: cmake -P {0}
-      run: |
-        set(bin_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/bin.tar.gz")
-        file(DOWNLOAD "${bin_url}" $ENV{BUID_DIR}/bin.tar.gz SHOW_PROGRESS) 
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar zxvf ./bin.tar.gz WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download clang
-      id: clang
-      shell: cmake -P {0}
-      run: |
-        set(clang_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/clang-msvc-9.0.1.7z")
-        file(DOWNLOAD "${clang_url}" $ENV{BUID_DIR}/clang-msvc-9.0.1.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./clang-msvc-9.0.1.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download msys
-      id: msys
-      shell: cmake -P {0}
-      run: |
-        set(msys_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/msys-1.0.7z")
-        file(DOWNLOAD "${msys_url}" $ENV{BUID_DIR}/msys-1.0.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./msys-1.0.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download nodejs
-      id: nodejs
-      shell: cmake -P {0}
-      run: |
-        set(nodejs_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/nodejs.7z")
-        file(DOWNLOAD "${nodejs_url}" $ENV{BUID_DIR}/nodejs.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./nodejs.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download nsis
-      id: nsis301
-      shell: cmake -P {0}
-      run: |
-        set(nsis301_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/nsis301.7z")
-        file(DOWNLOAD "${nsis301_url}" $ENV{BUID_DIR}/nsis301.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./nsis301.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download kdiff3
-      id: kdiff3
-      shell: cmake -P {0}
-      run: |
-        set(kdiff3_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/kdiff3.7z")
-        file(DOWNLOAD "${kdiff3_url}" $ENV{BUID_DIR}/kdiff3.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./kdiff3.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download hg
-      id: mercurial
-      shell: cmake -P {0}
-      run: |
-        set(hg_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/hg.7z")
-        file(DOWNLOAD "${hg_url}" $ENV{BUID_DIR}/hg.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./hg.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download rust
-      id: rust
-      shell: cmake -P {0}
-      run: |
-        set(rust_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/rust-1.43.1.7z")
-        file(DOWNLOAD "${rust_url}" $ENV{BUID_DIR}/rust-1.43.1.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./rust-1.43.1.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
-        
-    - name: Download python-2.7.18
-      id: python2
-      shell: cmake -P {0}
-      run: |
-        set(python2_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/python-2.7.18.7z")
-        file(DOWNLOAD "${python2_url}" $ENV{BUID_DIR}/python-2.7.18.7z SHOW_PROGRESS)  
-        execute_process(COMMAND 7z x ./python-2.7.18.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})  
-        
-    - name: Download python-3.7.7
-      id: python3
-      shell: cmake -P {0}
-      run: |
-        set(python3_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/python-3.7.7.7z")
-        file(DOWNLOAD "${python3_url}" $ENV{BUID_DIR}/python-3.7.7.7z SHOW_PROGRESS)   
-        execute_process(COMMAND 7z x ./python-3.7.7.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})                                    
-        
-    - name: Download msysdo
-      id: msysdo
-      shell: cmake -P {0}
-      run: |
-        set(msysdo_url "https://sourceforge.net/projects/libportable/files/Tools/mozillabuild/msysdo.7z")
-        file(DOWNLOAD "${msysdo_url}" $ENV{BUID_DIR}/msysdo.7z SHOW_PROGRESS)
-        execute_process(COMMAND 7z x ./msysdo.7z -aoa WORKING_DIRECTORY $ENV{BUID_DIR})
                 
     - name: Show envs
       id: show_env
@@ -144,7 +56,7 @@ jobs:
         name: ${{ env.APP_NAME }}-${{ env.MY_VER }}.en-US.${{ env.MY_BITS }}.7z
 
     - name: Current time
-      uses: nanzm/get-time-action@v1.0
+      uses: yxl0756/get-time-action@v1.0
       id: current-time
       with:
         timeZone: 8
@@ -152,7 +64,7 @@ jobs:
  
     - name: Create Release
       id: create_release
-      uses: fleskesvor/create-release@1a72e235c178bf2ae6c51a8ae36febc24568c5fe
+      uses: yxl0756/create-release@1a72e235c178bf2ae6c51a8ae36febc24568c5fe
       env:
         GITHUB_TOKEN: ${{ secrets.ADONAIS_RELEASE_TOKEN }}
       with:
