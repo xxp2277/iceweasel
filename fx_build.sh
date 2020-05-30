@@ -45,7 +45,7 @@ fi
 
 $MAKE maybe_clobber_profiledbuild
 ../iceweasel/configure --enable-profile-use=cross --enable-lto=cross
-$MAKE -j4 2>&1 | tee -i ../pgo_build.log
+$MAKE -j4
 if [ "$?" != "0" ]; then
   echo Second compilation failed. >> error.log
   exit 1;

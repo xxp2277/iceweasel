@@ -19,10 +19,13 @@ def make_7z(source, suffix, package):
     os.mkdir(dist_source)
     path = shutil.copytree(source, dist_source + '/App')
     user = os.environ.get('LIBPORTABLE_PATH')
+    vc_crt = os.environ.get('VC_REDISTDIR')
+    if vc_crt:
+        if (suffix == '_x64'):
+            if os.path.exists(vc_crt + 'x64/Microsoft.VC142.CRT/vcruntime140_1.dll'):
+                path = shutil.copy(vc_crt + 'x64/Microsoft.VC142.CRT/vcruntime140_1.dll', dist_source + '/App')
     if user:
         if (suffix == '_x64'):
-            if os.path.exists('C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Redist/MSVC/14.25.28508/x64/Microsoft.VC142.CRT/vcruntime140_1.dll'):
-                path = shutil.copy('C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Redist/MSVC/14.25.28508/x64/Microsoft.VC142.CRT/vcruntime140_1.dll', dist_source + '/App')
             if os.path.exists(user + '/bin/portable64.dll'):
                 path = shutil.copy(user + '/bin/portable64.dll', dist_source + '/App')
         else:
